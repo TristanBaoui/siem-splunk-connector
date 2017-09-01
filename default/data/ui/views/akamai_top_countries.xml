@@ -1,0 +1,37 @@
+<form>
+  <label>Countries</label>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="time">
+      <label></label>
+      <default>
+        <earliest>-4h@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="field1">
+      <label>Sourcetype</label>
+      <default>taakamaisiem</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Events by Country</title>
+      <map>
+        <search>
+          <query>sourcetype=$field1$  | lookup countrycodes code as "geo.country" OUTPUTNEW lat as latitude, lon as longitude | geostats latfield=latitude longfield=longitude count by "geo.country"</query>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="mapping.type">marker</option>
+      </map>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>sourcetype=$field1$  | stats count by "geo.country" | lookup countrycodes code as "geo.country" OUTPUTNEW lat as latitude, lon as longitude</query>
+        </search>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,66 @@
+<form>
+  <label>Akamai Logging</label>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="time">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Error Events</title>
+        <search>
+          <query>index="_internal" sourcetype="taakamaisiem*" ERROR | stats count as TotalErrors</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Info Events</title>
+        <search>
+          <query>index="_internal" sourcetype="taakamaisiem*" CASE(INFO) | stats count as TotalInfo</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Events</title>
+        <search>
+          <query>index="_internal" sourcetype="taakamaisiem*" | stats count as TotalEvents</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <event>
+        <title>Akamai SIEM Logs</title>
+        <search>
+          <query>index="_internal" sourcetype="taakamaisiem*"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+      </event>
+    </panel>
+    <panel>
+      <event>
+        <title>Akamai SIEM Errors</title>
+        <search>
+          <query>index="_internal" sourcetype="taakamaisiem*" CASE(ERROR)</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+      </event>
+    </panel>
+  </row>
+</form>

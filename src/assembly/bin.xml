@@ -1,0 +1,44 @@
+
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+	<id>bundle</id>
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<fileSets>
+	  <fileSet>
+	    <directory>.</directory>
+	    <outputDirectory>TAAkamai_SIEM</outputDirectory>
+	    <includes>
+	      <include>linux_x86_64/**/*</include>
+	      <include>linux_x86/**/*</include>
+		  <include>darwin_x86_64/**/*</include>
+		  <include>windows_x86/**/*</include>
+		  <include>windows_x86_64/**/*</include>
+	    </includes>
+	    <fileMode>0755</fileMode>
+	  </fileSet>
+	  <fileSet>
+	    <directory>.</directory>
+	    <outputDirectory>TAAkamai_SIEM</outputDirectory>
+	    <excludes>
+	      <exclude>dist/**/*</exclude>
+	      <exclude>target/**/*</exclude>
+		  <exclude>.*</exclude>
+		  <exclude>**/.*</exclude>
+	      <exclude>linux_x86_64/**/*</exclude>
+	      <exclude>linux_x86/**/*</exclude>
+		  <exclude>darwin_x86_64/**/*</exclude>
+		  <exclude>windows_x86/**/*</exclude>
+		  <exclude>windows_x86_64/**/*</exclude>
+	    </excludes>
+	    <includes>
+	    	<include>**/*</include>
+	    </includes>
+	    <fileMode>0644</fileMode>
+	  </fileSet>
+	</fileSets>
+</assembly>
