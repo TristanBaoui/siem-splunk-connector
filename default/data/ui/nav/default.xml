@@ -1,65 +1,8 @@
 <nav search_view="search" color="#d3d3d3">
-
-
-
-
-
-
-
-    <view name="configuration"/>
-
-
-
-
-
-
-
     <view name="search" label="Search"/>
-
-
-
-
-
-
-
     <collection label="Dashboards">
-
-
-
-
-
-
-
         <view name="akamai_overview" default="true"/>
-
-
-
-
-
-
-
         <view name="akamai_top_countries" default="true"/>
-
-
-
-
-
-
-
         <view name="splunk_on_akamai"/>
-
-
-
-
-
-
-
     </collection>
-
-
-
-
-
-
-
 </nav>

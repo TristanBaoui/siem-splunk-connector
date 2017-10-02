@@ -1,4 +1,4 @@
-[TAAkamai_SIEM://<name>]
+[TA-Akamai_SIEM://<name>]
 rest_username = <value>
 rest_password = <value>
 hostname = <value>
