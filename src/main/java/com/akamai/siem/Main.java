@@ -1,5 +1,7 @@
 package com.akamai.siem;
 
+import com.akamai.siem.stanza_state;
+
 import com.splunk.Args;
 import com.splunk.HttpService;
 import com.splunk.Job;
@@ -51,9 +53,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 
 //All modular inputs should inherit from the abstract base class com.splunk.modularinput.Script. They must override
@@ -77,6 +76,7 @@ public class Main extends Script
 	private static String _AKAMAI_API_URL_PATH_ = "/siem/v1/configs/%s";
 	private static String _AKAMAI_API_SECURITY_CONFIG_DELIMITER_ = ";";
 	private static Integer _AKAMAI_API_MAX_LIMIT_= 600000;
+	private static Integer _AKAMAI_API_MAX_CONSECUTIVE_ERRORS_ = 5;
 	
 	private static final Set<String> base64fields = new HashSet<String>(Arrays.asList(
 		     new String[] {
@@ -86,8 +86,7 @@ public class Main extends Script
     			"ruleTags",
     			"ruleData",
     			"ruleSelectors",
-    			"ruleActions",
-    			"custom"	 
+    			"ruleActions" 
 		     }
 		));
 	
@@ -113,7 +112,7 @@ public class Main extends Script
 		return new String(Base64.decodeBase64(value), StandardCharsets.UTF_8);
 	}
 	
-	private static JsonObject parseData(JsonObject d) throws Exception
+	private static JsonObject parseData(JsonObject d, boolean isCustom) throws Exception
 	{
 		StringBuilder sb = new StringBuilder("");
 		
@@ -121,7 +120,12 @@ public class Main extends Script
 		{
 			if(entry.getValue().isJsonObject() == true)
 			{
-				parseData(entry.getValue().getAsJsonObject());
+				boolean isCustomEntry = false;
+				if("custom".equalsIgnoreCase(entry.getKey()) == true)
+				{
+					isCustomEntry = true;
+				}
+				parseData(entry.getValue().getAsJsonObject(), isCustomEntry);
 			}
 			else
 			{						
@@ -146,7 +150,8 @@ public class Main extends Script
 					ArrayList<String> decodedValues = new ArrayList<String>();
 					for(String s : tokenizedResult)
 					{
-						if(base64fields.contains(k) == true)
+						if(   (base64fields.contains(k) == true)
+						   || (isCustom == true))
 						{
 							String[] detectSpaces = s.split(" ");
 							StringBuilder sb2 = new StringBuilder();
@@ -175,7 +180,8 @@ public class Main extends Script
 				}
 				else if(tokenizedResult.length > 0)
 				{
-					if(base64fields.contains(k) == true)
+					if(   (base64fields.contains(k) == true)
+					   || (isCustom == true))
 					{
 						String[] detectSpaces = tokenizedResult[0].split(" ");
 						StringBuilder sb2 = new StringBuilder();
@@ -214,7 +220,7 @@ public class Main extends Script
 
 	public static JsonObject processData(JsonObject d) throws Exception
 	{
-		JsonObject parsedData = parseData(d);
+		JsonObject parsedData = parseData(d, false);
 		
 		JsonElement attackData = parsedData.get("attackData");
 		JsonObject attackDataJsonObj = attackData.getAsJsonObject();
@@ -354,7 +360,7 @@ public class Main extends Script
     @Override
     public Scheme getScheme() 
     {
-    	Scheme scheme = new Scheme("AKAMAI SIEM API [JAVA]");
+    	Scheme scheme = new Scheme("AKAMAI SIEM API");
     	scheme.setDescription("Security Information and Event Management");
     	scheme.setUseExternalValidation(true);
     	scheme.setUseSingleInstance(false);  	
@@ -507,21 +513,21 @@ public class Main extends Script
     	
     	for(String inputName: inputs.getInputs().keySet())
     	{
-    		ew.synchronizedLog(EventWriter.INFO, inputName);
+    		ew.synchronizedLog(EventWriter.DEBUG, inputName);
     		
-    		ew.synchronizedLog(EventWriter.INFO, inputs.getInputs().get(inputName).toString());
+    		ew.synchronizedLog(EventWriter.DEBUG, inputs.getInputs().get(inputName).toString());
     		
             String hostname = ((SingleValueParameter)inputs.getInputs().get(inputName).get("hostname")).getValue();
-            ew.synchronizedLog(EventWriter.INFO, hostname);
+            ew.synchronizedLog(EventWriter.DEBUG, hostname);
             
             String security_configuration_id_s_ = ((SingleValueParameter)inputs.getInputs().get(inputName).get("security_configuration_id_s_")).getValue();
-            ew.synchronizedLog(EventWriter.INFO, security_configuration_id_s_);
+            ew.synchronizedLog(EventWriter.DEBUG, security_configuration_id_s_);
             
             String client_token = ((SingleValueParameter)inputs.getInputs().get(inputName).get("client_token")).getValue();
-            ew.synchronizedLog(EventWriter.INFO, client_token);
+            ew.synchronizedLog(EventWriter.DEBUG, client_token);
             
             String client_secret = ((SingleValueParameter)inputs.getInputs().get(inputName).get("client_secret")).getValue();
-            ew.synchronizedLog(EventWriter.INFO, client_secret);
+            ew.synchronizedLog(EventWriter.DEBUG, client_secret);
             
             String access_token = "";
             try
@@ -532,7 +538,7 @@ public class Main extends Script
             {
             }
             
-            ew.synchronizedLog(EventWriter.INFO, access_token);
+            ew.synchronizedLog(EventWriter.DEBUG, access_token);
             
             String initial_epoch_time = "";
             try
@@ -543,7 +549,7 @@ public class Main extends Script
             {
             }
             
-            ew.synchronizedLog(EventWriter.INFO, initial_epoch_time);
+            ew.synchronizedLog(EventWriter.DEBUG, initial_epoch_time);
             
             String final_epoch_time = "";
             try
@@ -554,7 +560,7 @@ public class Main extends Script
             {	
             }
               
-            ew.synchronizedLog(EventWriter.INFO, final_epoch_time);
+            ew.synchronizedLog(EventWriter.DEBUG, final_epoch_time);
             
             String rest_username = "";
             try
@@ -565,7 +571,7 @@ public class Main extends Script
             {	
             }
               
-            ew.synchronizedLog(EventWriter.INFO, rest_username);
+            ew.synchronizedLog(EventWriter.DEBUG, rest_username);
             
             String rest_password = "";
             try
@@ -588,17 +594,17 @@ public class Main extends Script
 	        }
             
             String sessionKey = inputs.getSessionKey();
-            ew.synchronizedLog(EventWriter.INFO, sessionKey);
+            ew.synchronizedLog(EventWriter.DEBUG, sessionKey);
             
             
-            ew.synchronizedLog(EventWriter.INFO, limit.toString());
+            ew.synchronizedLog(EventWriter.DEBUG, limit.toString());
             
             // Splunk Enterprise calls the modular input, 
             //   streams XML describing the inputs to stdin, 
             //   and waits for XML on stdout describing events.
 
         	ew.synchronizedLog(EventWriter.INFO, "infoMsg=\"Processing Data...\"");
-        	
+
         	
         	HttpService.setSslSecurityProtocol(SSLSecurityProtocol.TLSv1_2);
     		
@@ -615,12 +621,13 @@ public class Main extends Script
     		
         	Service splunkService = Service.connect(serviceArgs);
         	
-        	ResponseMessage rm = splunkService.get("/servicesNS/nobody/TAAkamai_SIEM/storage/collections/data/taakamai_siem_state");
+        	ResponseMessage rm = splunkService.get("/servicesNS/nobody/TA-Akamai_SIEM/storage/collections/data/akamai_state");
         	
-        	ew.synchronizedLog(EventWriter.INFO, String.valueOf(rm.getStatus()));
+        	ew.synchronizedLog(EventWriter.DEBUG, "infoMsg=\"KVStore response = " + String.valueOf(rm.getStatus()) + "\"");
         	BufferedReader reader = new BufferedReader(new InputStreamReader(rm.getContent(), "UTF-8"));
         	stanza_state kvStoreStanza = null;
         	String offset = null;
+        	Integer error_count = 0;
             while (true) 
             {
                 String line = reader.readLine();
@@ -639,6 +646,15 @@ public class Main extends Script
                 	{
                 		kvStoreStanza = ss;
                 		offset = ss.offset;
+                		if(ss.error_count == null)
+                		{
+                			error_count = 0;
+                		}
+                		else
+                		{
+                			error_count = ss.error_count;
+                		}
+                		
                 	}
                 }
                
@@ -664,9 +680,12 @@ public class Main extends Script
         	
         	
             HttpGet request = new HttpGet(urlToRequest);
+            HttpResponse response = null;
+            int statusCode = 0;
+            
             try {
-                 HttpResponse response = client.execute(request);
-                 int statusCode = response.getStatusLine().getStatusCode();
+                 response = client.execute(request);
+                 statusCode = response.getStatusLine().getStatusCode();
 
                  if(statusCode == 200)
                  {
@@ -680,7 +699,7 @@ public class Main extends Script
 
 	                 String line = "";
 
-                	 int numLines = 0;
+                	 long numLines = 0;
                 	 
                      String next = "";
                      line = bufferedreader.readLine();
@@ -703,6 +722,7 @@ public class Main extends Script
 	        	            	 
 	        	                 
 	        	                 ew.synchronizedLog(EventWriter.INFO, "infoMsg=\"parsing last line\"");
+	        	                 ew.synchronizedLog(EventWriter.INFO, "infoMsg=\"numLines=" + String.valueOf(numLines) + "\"");
 	        	                 ew.synchronizedLog(EventWriter.INFO, "line=" + line);
 	        	                 
 	        	                 String newOffset = "";
@@ -727,8 +747,8 @@ public class Main extends Script
 	        	                     requestMessage.getHeader().put("Content-Type",  "application/json");
 	        	                     requestMessage.setContent(gson.toJson(kvStoreStanza));
 	        	                     
-	        	                     ResponseMessage rm2 = splunkService.send(String.format("/servicesNS/nobody/TAAkamai_SIEM/storage/collections/data/taakamai_siem_state/%s", kvStoreStanza._key), requestMessage);
-	        	                     ew.synchronizedLog(EventWriter.INFO, String.valueOf(rm2.getStatus()));
+	        	                     ResponseMessage rm2 = splunkService.send(String.format("/servicesNS/nobody/TA-Akamai_SIEM/storage/collections/data/akamai_state/%s", kvStoreStanza._key), requestMessage);
+	        	                     ew.synchronizedLog(EventWriter.DEBUG, String.valueOf(rm2.getStatus()));
 	        	                 }
 	        	                 else
 	        	                 {
@@ -743,16 +763,18 @@ public class Main extends Script
 	        	                     requestMessage.getHeader().put("Content-Type",  "application/json");
 	        	                     requestMessage.setContent(gson.toJson(kvStoreStanza));
 	        	                     
-	        	                     ResponseMessage rm2 = splunkService.send("/servicesNS/nobody/TAAkamai_SIEM/storage/collections/data/taakamai_siem_state/", requestMessage);
-	        	                     ew.synchronizedLog(EventWriter.INFO, String.valueOf(rm2.getStatus()));
+	        	                     ResponseMessage rm2 = splunkService.send("/servicesNS/nobody/TA-Akamai_SIEM/storage/collections/data/akamai_state/", requestMessage);
+	        	                     ew.synchronizedLog(EventWriter.DEBUG, String.valueOf(rm2.getStatus()));
 	        	                 }
 	                         } 
 	                         else 
 	                         {
 	                        	 numLines++;
-	                        	 //ew.synchronizedLog(EventWriter.INFO, line);
+
+	                        	 ew.synchronizedLog(EventWriter.DEBUG, line);
 		    	            	 JsonObject jObj = parser.parse(line).getAsJsonObject();
 		    	            	 JsonObject newJsonObj = processData(jObj);
+		    	            	 ew.synchronizedLog(EventWriter.DEBUG, newJsonObj.toString());
 		    	            	 
 		    	            	 Event event = new Event();
 		    	            	 event.setStanza(inputName);
@@ -785,12 +807,72 @@ public class Main extends Script
                 	 Event event = new Event();
 	            	 event.setStanza(inputName);
 	            	 event.setData(errorEvent);
+	            	 ew.writeEvent(event);
+	            	 
+	            	 error_count++;
+	            	 if(error_count >= _AKAMAI_API_MAX_CONSECUTIVE_ERRORS_)
+	            	 {
+	            		 ew.synchronizedLog(EventWriter.INFO, "infoMsg=\"" + _AKAMAI_API_MAX_CONSECUTIVE_ERRORS_ + " consecutive errors.  Clearing offset and error count\"");
+	            		 offset = "";
+	            		 error_count = 0;
+	            	 }
+	            	 
+	            	 
+	            	 Gson gson = new Gson();
+	            	 kvStoreStanza.offset = offset;
+                	 kvStoreStanza.error_count = error_count;
+                	 kvStoreStanza.stanza_change = false;
+                	 
+                	 ew.synchronizedLog(EventWriter.INFO, "kvStoreStanza=\"" + gson.toJson(kvStoreStanza) + "\"");
+                     
+                     RequestMessage requestMessage = new RequestMessage("POST");
+                     requestMessage.getHeader().put("Content-Type",  "application/json");
+                     requestMessage.setContent(gson.toJson(kvStoreStanza));
+                     
+                     ResponseMessage rm2 = splunkService.send(String.format("/servicesNS/nobody/TA-Akamai_SIEM/storage/collections/data/akamai_state/%s", kvStoreStanza._key), requestMessage);
+                     ew.synchronizedLog(EventWriter.DEBUG, "infoMsg=\"KVStore response = " + String.valueOf(rm2.getStatus()) + "\"");
                 	 
                  }
-                 
+                                  
              } catch (IOException e) {	 
                  e.printStackTrace();
+                 
+                 String responseData = EntityUtils.toString(response.getEntity());
+            	 String errorEvent = "error=\"Exception processing response\"";
+            	 
+            	 ew.synchronizedLog(EventWriter.INFO, errorEvent);
+            	 
+            	 Event event = new Event();
+            	 event.setStanza(inputName);
+            	 event.setData(errorEvent);
+            	 ew.writeEvent(event);
+            	 
+            	 error_count++;
+            	 if(error_count >= _AKAMAI_API_MAX_CONSECUTIVE_ERRORS_)
+            	 {
+            		 ew.synchronizedLog(EventWriter.INFO, "infoMsg=\"" + _AKAMAI_API_MAX_CONSECUTIVE_ERRORS_ + " consecutive errors.  Clearing offset and error count\"");
+            		 offset = "";
+            		 error_count = 0;
+            	 }
+            	 
+            	 
+            	 Gson gson = new Gson();
+            	 kvStoreStanza.offset = offset;
+            	 kvStoreStanza.error_count = error_count;
+            	 kvStoreStanza.stanza_change = false;
+            	 
+            	 ew.synchronizedLog(EventWriter.INFO, "kvStoreStanza=\"" + gson.toJson(kvStoreStanza) + "\"");
+                 
+                 RequestMessage requestMessage = new RequestMessage("POST");
+                 requestMessage.getHeader().put("Content-Type",  "application/json");
+                 requestMessage.setContent(gson.toJson(kvStoreStanza));
+                 
+                 ResponseMessage rm2 = splunkService.send(String.format("/servicesNS/nobody/TA-Akamai_SIEM/storage/collections/data/akamai_state/%s", kvStoreStanza._key), requestMessage);
+                 ew.synchronizedLog(EventWriter.INFO, String.valueOf(rm2.getStatus()));
+                 
              }
     	}
+    	
+    	ew.synchronizedLog(EventWriter.INFO, "end streamEvents");
     }
 }

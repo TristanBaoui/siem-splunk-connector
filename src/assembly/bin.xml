@@ -11,7 +11,7 @@
 	<fileSets>
 	  <fileSet>
 	    <directory>.</directory>
-	    <outputDirectory>TAAkamai_SIEM</outputDirectory>
+	    <outputDirectory>TA-Akamai_SIEM</outputDirectory>
 	    <includes>
 	      <include>linux_x86_64/**/*</include>
 	      <include>linux_x86/**/*</include>
@@ -23,7 +23,7 @@
 	  </fileSet>
 	  <fileSet>
 	    <directory>.</directory>
-	    <outputDirectory>TAAkamai_SIEM</outputDirectory>
+	    <outputDirectory>TA-Akamai_SIEM</outputDirectory>
 	    <excludes>
 	      <exclude>dist/**/*</exclude>
 	      <exclude>target/**/*</exclude>

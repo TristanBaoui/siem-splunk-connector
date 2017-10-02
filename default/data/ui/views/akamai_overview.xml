@@ -15,7 +15,7 @@
     </input>
     <input type="text" token="field1">
       <label>Sourcetype</label>
-      <default>taakamaisiem</default>
+      <default>akamaisiem</default>
     </input>
   </fieldset>
   <row>
