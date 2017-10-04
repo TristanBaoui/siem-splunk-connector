@@ -74,7 +74,7 @@
 						</goals>
 						<configuration>
 							<sourceFile>target/TA-Akamai_SIEM-${project.version}-jar-with-dependencies.jar</sourceFile>
-							<destinationFile>jars/TA-Akamai_SIEM.jar</destinationFile>
+							<destinationFile>target/TA-Akamai_SIEM.jar</destinationFile>
 						</configuration>
 					</execution>
 					<execution>
@@ -85,7 +85,7 @@
 						</goals>
 						<configuration>
 							<sourceFile>target/TA-Akamai_SIEM-${project.version}-bundle.tar.gz</sourceFile>
-							<destinationFile>dist/TA-Akamai_SIEM-${project.version}.spl</destinationFile>
+							<destinationFile>target/TA-Akamai_SIEM-${project.version}.spl</destinationFile>
 						</configuration>
 					</execution>
 				</executions>
