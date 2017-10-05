@@ -76,6 +76,7 @@ public class Main extends Script
 	private static String _AKAMAI_API_URL_PATH_ = "/siem/v1/configs/%s";
 	private static String _AKAMAI_API_SECURITY_CONFIG_DELIMITER_ = ";";
 	private static Integer _AKAMAI_API_MAX_LIMIT_= 600000;
+	private static Integer _AKAMAI_API_DEFAULT_LIMIT_ = 150000;
 	private static Integer _AKAMAI_API_MAX_CONSECUTIVE_ERRORS_ = 5;
 	
 	private static final Set<String> base64fields = new HashSet<String>(Arrays.asList(
@@ -308,6 +309,10 @@ public class Main extends Script
 			{
 				retVal = retVal + String.format(_AKAMAI_API_PARAM_LIMIT_BASED, limit);
 			}
+			else
+			{
+				retVal = retVal + String.format(_AKAMAI_API_PARAM_LIMIT_BASED, _AKAMAI_API_DEFAULT_LIMIT_);
+			}
 			
 		}
 		else if(StringUtils.isEmpty(initialEpochTime) == false)
@@ -325,6 +330,10 @@ public class Main extends Script
 			{
 				retVal = retVal + String.format(_AKAMAI_API_PARAM_LIMIT_BASED, limit);
 			}
+			else
+			{
+				retVal = retVal + String.format(_AKAMAI_API_PARAM_LIMIT_BASED, _AKAMAI_API_DEFAULT_LIMIT_);
+			}
 			
 		}
 		else
@@ -341,7 +350,11 @@ public class Main extends Script
 			if(StringUtils.isEmpty(limit) == false)
 			{
 				retVal = retVal + String.format(_AKAMAI_API_PARAM_LIMIT_BASED, limit);
-			}		
+			}
+			else
+			{
+				retVal = retVal + String.format(_AKAMAI_API_PARAM_LIMIT_BASED, _AKAMAI_API_DEFAULT_LIMIT_);
+			}
 		}
 		
 		return(retVal);
