@@ -25,6 +25,7 @@
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
+					<finalName>TA-Akamai_SIEM</finalName>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
@@ -49,7 +50,6 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<descriptor>src/assembly/bin.xml</descriptor>
-					<finalName>TA-Akamai_SIEM-${project.version}</finalName>
 				</configuration>
 				<executions>
 					<execution>
@@ -58,35 +58,6 @@
 						<goals>
 							<goal>single</goal>
 						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.coderplus.maven.plugins</groupId>
-				<artifactId>copy-rename-maven-plugin</artifactId>
-				<version>1.0.1</version>
-				<executions>
-					<execution>
-						<id>rename-file2</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>rename</goal>
-						</goals>
-						<configuration>
-							<sourceFile>target/TA-Akamai_SIEM-${project.version}-jar-with-dependencies.jar</sourceFile>
-							<destinationFile>target/TA-Akamai_SIEM.jar</destinationFile>
-						</configuration>
-					</execution>
-					<execution>
-						<id>rename-file</id>
-						<phase>package</phase>
-						<goals>
-							<goal>rename</goal>
-						</goals>
-						<configuration>
-							<sourceFile>target/TA-Akamai_SIEM-${project.version}-bundle.tar.gz</sourceFile>
-							<destinationFile>target/TA-Akamai_SIEM-${project.version}.spl</destinationFile>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -168,6 +139,7 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>
