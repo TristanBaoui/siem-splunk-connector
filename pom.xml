@@ -50,6 +50,7 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<descriptor>src/assembly/bin.xml</descriptor>
+					<finalName>TA-Akamai_SIEM-${project.version}</finalName>
 				</configuration>
 				<executions>
 					<execution>
@@ -63,6 +64,18 @@
 			</plugin>
 		</plugins>
 	</build>
+	<distributionManagement>
+		<repository>
+			<id>nexus</id>
+			<name>Splunk Connector Release</name>
+			<url>https://lunabuild.akamai.com/nexus/service/local/staging/deploy/maven2</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus</id>
+			<name>Splunk Connector Snapshots</name>
+			<url>https://lunabuild.akamai.com/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<repositories>
 		<repository>
 			<id>java.net</id>
