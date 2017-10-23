@@ -16,7 +16,7 @@ Some additional hardware requirements as below:
 
 Installation Instructions
 
-Download the latest TA-Akamai_SIEM_1_0_x.spl file(x being the latest version available). In Apps, click on "Install app from file" and add the .spl file. Click on upload - this may involve restarting Splunk instance to complete installation.
+Download the latest TA-Akamai_SIEM_1_x_x.spl file(x being the latest version available). In Apps, click on "Install app from file" and add the .spl file. Click on upload - this may involve restarting Splunk instance to complete installation.
 
 Once installation is complete, navigate to Settings -> Data Inputs and select the local input for "Security Information and Event Management". Here, configure all the customer-specific credentials, and click on Save. Once created, enable this stanza to start retrieval of data.
 
