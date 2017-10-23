@@ -1,3 +1,5 @@
+Java-based Splunk SIEM connector
+
 System Requirements
 
 Akamai’s Splunk Connector requires Sun JDK 1.8+ to be installed. The latest JDK can be downloaded from the Sun Java site (Java Platform, Standard Edition) or installed from a software distribution package on Linux.
