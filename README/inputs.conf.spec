@@ -2,6 +2,8 @@
 rest_username = <value>
 rest_password = <value>
 hostname = <value>
+proxy_host = <value>
+proxy_port = <value>
 * API Endpoint
 security_configuration_id_s_ = <value>
 * Fetch data for specific Security Configuration(s) [semicolon delimited]

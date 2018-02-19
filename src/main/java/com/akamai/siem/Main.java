@@ -64,8 +64,10 @@ import com.google.gson.JsonPrimitive;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.HttpHost;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.util.EntityUtils;
 
 
@@ -414,6 +416,20 @@ public class Main extends Script
 		hostnameArgument.setRequiredOnEdit(false);
 		scheme.addArgument(hostnameArgument);
 		
+		Argument proxy_hostArgument = new Argument("proxy_host");
+		proxy_hostArgument.setName("proxy_host");
+		proxy_hostArgument.setDescription("");
+		proxy_hostArgument.setRequiredOnCreate(false);
+		proxy_hostArgument.setRequiredOnEdit(false);
+		scheme.addArgument(proxy_hostArgument);
+
+		Argument proxy_portArgument = new Argument("proxy_port");
+		proxy_portArgument.setName("proxy_port");
+		proxy_portArgument.setDescription("");
+		proxy_portArgument.setRequiredOnCreate(false);
+		proxy_portArgument.setRequiredOnEdit(false);
+		scheme.addArgument(proxy_portArgument);
+		
 		Argument security_configuration_id_s_Argument = new Argument("security_configuration_id_s_");
 		security_configuration_id_s_Argument.setName("security_configuration_id_s_");
 		security_configuration_id_s_Argument.setDescription("Fetch data for specific Security Configuration(s) [semicolon delimited]");
@@ -508,6 +524,8 @@ public class Main extends Script
         errors = checkStringSingleValue(errors, ((SingleValueParameter)definition.getParameters().get("rest_username")), "rest_username");
         errors = checkStringSingleValue(errors, ((SingleValueParameter)definition.getParameters().get("rest_password")), "rest_password");
         errors = checkStringSingleValue(errors, ((SingleValueParameter)definition.getParameters().get("hostname")), "hostname");
+	errors = checkStringSingleValue(errors, ((SingleValueParameter)definition.getParameters().get("proxy_host")), "proxy_host");
+	errors = checkStringSingleValue(errors, ((SingleValueParameter)definition.getParameters().get("proxy_port")), "proxy_port");
         errors = checkStringSingleValue(errors, ((SingleValueParameter)definition.getParameters().get("security_configuration_id_s_")), "security_configuration_id_s_");
         errors = checkStringSingleValue(errors, ((SingleValueParameter)definition.getParameters().get("client_token")), "client_token");
         errors = checkStringSingleValue(errors, ((SingleValueParameter)definition.getParameters().get("client_secret")), "client_secret");
@@ -547,7 +565,8 @@ public class Main extends Script
     		
             String hostname = ((SingleValueParameter)inputs.getInputs().get(inputName).get("hostname")).getValue();
             ew.synchronizedLog(EventWriter.DEBUG, hostname);
-            
+
+    
             String security_configuration_id_s_ = ((SingleValueParameter)inputs.getInputs().get(inputName).get("security_configuration_id_s_")).getValue();
             ew.synchronizedLog(EventWriter.DEBUG, security_configuration_id_s_);
             
@@ -568,6 +587,28 @@ public class Main extends Script
             
             ew.synchronizedLog(EventWriter.DEBUG, access_token);
             
+	    String proxy_host = "";
+	    try
+	    {
+		    proxy_host = ((SingleValueParameter)inputs.getInputs().get(inputName).get("proxy_host")).getValue();
+	    }
+	    catch(Exception ex)
+	    {
+	    }
+
+	    ew.synchronizedLog(EventWriter.DEBUG, proxy_host);
+
+	    String proxy_port = "";
+	    try
+	    {
+		    proxy_port = ((SingleValueParameter)inputs.getInputs().get(inputName).get("proxy_port")).getValue();
+	    }
+	    catch(Exception ex)
+	    {
+	    }
+
+	    ew.synchronizedLog(EventWriter.DEBUG, proxy_port);
+        
             String initial_epoch_time = "";
             try
             {
@@ -705,9 +746,25 @@ public class Main extends Script
                     .setRoutePlanner(new ApacheHttpClientEdgeGridRoutePlanner(credential))
                     .build();
 
-        	
+		RequestConfig configProxy = null;
+		int _proxy_port = 8888;
+		if(StringUtils.isEmpty(proxy_host) == false)
+		{
+			try {
+				_proxy_port = Integer.parseInt(proxy_port);
+			} catch (NumberFormatException e) {
+			}
+			HttpHost proxy = new HttpHost(proxy_host, _proxy_port, "http");
+			configProxy = RequestConfig.custom()
+				.setProxy(proxy)
+				.build();
+		}		
+   	
         	
             HttpGet request = new HttpGet(urlToRequest);
+	    if (configProxy != null) {
+		    request.setConfig(configProxy);
+	    }
             HttpResponse response = null;
             int statusCode = 0;
             

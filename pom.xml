@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>TA-Akamai_SIEM</groupId>
 	<artifactId>TA-Akamai_SIEM</artifactId>
-	<version>1.2.0</version>
+	<version>1.2.1</version>
 	<build>
 		<resources>
 			<resource>
@@ -81,6 +81,11 @@
 			<id>java.net</id>
 			<url>https://repo1.maven.org/maven2/</url>
 		</repository>
+		<repository>
+			<id>splunk-artifactory</id>
+			<name>Splunk Releases</name>
+			<url>http://splunk.artifactoryonline.com/splunk/ext-releases-local</url>
+		</repository>
 	</repositories>
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
@@ -129,7 +134,7 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.5.3</version>
+			<version>4.5.5</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->
 		<dependency>
